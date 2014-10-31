@@ -1,0 +1,77 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, minimum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>H5获取经纬度</title>
+</head>
+<body>
+<h5>通过HTML5获取到的经纬度</h5>
+<div><tt>纬度：<tt><span id="latitude"></span></div>
+<div><tt>经度：<tt><span id="longitude"></span></div>
+<div><tt>精度：<tt><span id="accuracy"></span></div>
+<h5>通过百度地图将经纬度转地址</h5>
+<div><tt>省：<tt><span id="province"></span></div>
+<div><tt>市：<tt><span id="city"></span></div>
+<div><tt>区：<tt><span id="district"></span></div>
+<div><tt>街：<tt><span id="street"></span></div>
+<div><tt>门牌号：<tt><span id="street_number"></span></div>
+<div><tt>详情地址：<tt><span id="address"></span></div>
+
+<script type="text/javascript">
+
+    function getById( id ){
+        return document.getElementById( id );
+    }
+
+    //判断是否支持GPS
+    function lodeSupport(){
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(updataPosition);
+        }else{
+            alert('浏览器不支持');
+        }
+    }
+
+    //获取GPS
+    function updataPosition(position){
+        var latitudeP = position.coords.latitude,
+                longitudeP = position.coords.longitude,
+                accuracyP = position.coords.accuracy;
+        getById( 'latitude' ).innerHTML = latitudeP;
+        getById( 'longitude' ).innerHTML = longitudeP;
+        getById( 'accuracy' ).innerHTML = accuracyP;
+        createBmap( latitudeP,longitudeP )
+    }
+
+
+    //创建百度接口
+    //createBmap(30.193051835205,120.21639580252);
+    function createBmap(x,y){
+
+        var _h = 'http://api.map.baidu.com/geocoder/v2/?ak=kNKPkrEL0sajA2QGMinK08qH&callback=renderReverse&location=' + x + ',' + y + '&output=json&pois=0',
+                _s = document.createElement( 'script' );
+        _s.setAttribute( 'src', _h );
+        _s.setAttribute( 'id', 'gm');
+        document.body.appendChild( _s )
+
+    }
+
+    //创建百度接口回调
+    function renderReverse(data){
+        //getById( 'other').innerHTML = data ;
+        getById( 'address').innerHTML = data.result.formatted_address ;
+        getById( 'city').innerHTML = data.result.addressComponent.city ;
+        getById( 'province').innerHTML = data.result.addressComponent.province ;
+        getById( 'district').innerHTML = data.result.addressComponent.district ;
+        getById( 'street').innerHTML = data.result.addressComponent.street ;
+        getById( 'street_number').innerHTML = data.result.addressComponent.street_number ;
+        //getById( 'gm').remove();
+    }
+
+    window.addEventListener('load', lodeSupport , true);
+
+</script>
+
+</body>
+</html>
